@@ -12,6 +12,9 @@ import java.util.concurrent.BlockingQueue;
 
 public final class Connection implements Runnable {
 
+    private final static int END_OF_STREAM = -1;
+    private final static int BUFFER_SIZE = 1024 * 1024;
+
     private final BlockingQueue<String> requestQueue = new ArrayBlockingQueue<>(1);
     private final BlockingQueue<String> responseQueue = new ArrayBlockingQueue<>(1);
     private final Selector selector;
@@ -54,9 +57,9 @@ public final class Connection implements Runnable {
     }
 
     private void read(SelectionKey key) throws IOException, InterruptedException {
-        var buffer = ByteBuffer.allocate(2000);
+        var buffer = ByteBuffer.allocate(BUFFER_SIZE);
         int bytes = this.channel.read(buffer);
-        if (bytes == -1) throw new IOException();
+        if (bytes == END_OF_STREAM) throw new IOException();
         this.responseQueue.put(new String(buffer.array()).trim());
         key.interestOps(SelectionKey.OP_WRITE);
     }
