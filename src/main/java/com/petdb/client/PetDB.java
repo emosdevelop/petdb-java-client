@@ -15,11 +15,13 @@ public final class PetDB {
         this.address = address;
         try {
             this.connection = new Connection(address);
-            pool.submit(this.connection);
         } catch (IOException e) {
             e.printStackTrace();
-            this.close();
         }
+    }
+
+    public void start() {
+        this.pool.submit(this.connection);
     }
 
     public void close() {

@@ -15,6 +15,7 @@ class PetDBTest {
     @BeforeEach
     void initDB() {
         db = new PetDB(new InetSocketAddress(12542));
+        db.start();
     }
 
     @AfterEach
@@ -26,5 +27,7 @@ class PetDBTest {
     void testCall() {
         String result = db.call("set abc c");
         assertEquals("OK",result);
+        System.out.println(db.call("aa"));
+        System.out.println(db.call("get abc"));
     }
 }
