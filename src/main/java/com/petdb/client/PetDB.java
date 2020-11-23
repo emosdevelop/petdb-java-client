@@ -10,6 +10,7 @@ public final class PetDB {
     private final ExecutorService pool = Executors.newFixedThreadPool(1);
     private final InetSocketAddress address;
     private Connection connection;
+    private boolean isRunning;
 
     public PetDB(InetSocketAddress address) {
         this.address = address;
@@ -20,17 +21,28 @@ public final class PetDB {
         }
     }
 
-    public void start() {
+    public void open() {
+        if (this.isRunning) {
+            throw new PetDBClientConnectionException(
+                    "Connection to PetDB server is already open");
+        }
+        this.isRunning = true;
         this.pool.submit(this.connection);
     }
 
     public void close() {
-        pool.shutdown();
+        this.isRunning = false;
+        this.pool.shutdown();
     }
 
     public String call(String query) {
         if (query.isEmpty() || query.isBlank()) {
             return "";
+        } else if (this.pool.isShutdown() ||
+                this.pool.isTerminated() ||
+                !this.isRunning) {
+            throw new PetDBClientConnectionException(
+                    "Connection to PetDB server is not open");
         }
         this.connection.newRequest(query.trim());
         return this.connection.getResponse();
