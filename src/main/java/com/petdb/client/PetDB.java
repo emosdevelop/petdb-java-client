@@ -41,6 +41,7 @@ public final class PetDB {
         } else if (this.pool.isShutdown() ||
                 this.pool.isTerminated() ||
                 !this.isRunning) {
+            this.isRunning = false;
             throw new PetDBClientConnectionException(
                     "Connection to PetDB server is not open");
         }
