@@ -6,7 +6,8 @@ import org.junit.jupiter.api.Test;
 
 import java.net.InetSocketAddress;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PetDBTest {
 
@@ -15,7 +16,7 @@ class PetDBTest {
     @BeforeEach
     void initDB() {
         db = new PetDB(new InetSocketAddress(12542));
-        db.start();
+        db.open();
     }
 
     @AfterEach
@@ -25,9 +26,26 @@ class PetDBTest {
 
     @Test
     void testCall() {
-        String result = db.call("set abc c");
-        assertEquals("OK",result);
-        System.out.println(db.call("aa"));
-        System.out.println(db.call("get abc"));
+        String result = db.call("set key value");
+        assertEquals("OK", result);
+    }
+
+    @Test
+    void testClose() {
+        Throwable exceptionThatWasThrown = assertThrows(PetDBClientConnectionException.class, () -> {
+            this.db.close();
+            this.db.call("something");
+        });
+        assertEquals("Connection to PetDB server is not open",
+                exceptionThatWasThrown.getMessage());
+    }
+
+    @Test
+    void testOpenTwice() {
+        Throwable exceptionThatWasThrown = assertThrows(PetDBClientConnectionException.class, () -> {
+            this.db.open();
+        });
+        assertEquals("Connection to PetDB server is already open",
+                exceptionThatWasThrown.getMessage());
     }
 }
