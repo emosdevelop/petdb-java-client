@@ -28,6 +28,8 @@ class PetDBTest {
     void testCall() {
         String result = db.call("set key value");
         assertEquals("OK", result);
+        result = db.call("get key");
+        assertEquals("value", result);
     }
 
     @Test

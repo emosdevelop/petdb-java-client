@@ -15,6 +15,7 @@ public final class Connection implements Runnable {
     private final static int END_OF_STREAM = -1;
     private final static int BUFFER_SIZE = 1024 * 1024;
 
+    private final ByteBuffer readBuffer = ByteBuffer.allocate(BUFFER_SIZE);
     private final BlockingQueue<String> requestQueue = new ArrayBlockingQueue<>(1);
     private final BlockingQueue<String> responseQueue = new ArrayBlockingQueue<>(1);
     private final Selector selector;
@@ -57,10 +58,10 @@ public final class Connection implements Runnable {
     }
 
     private void read(SelectionKey key) throws IOException, InterruptedException {
-        var buffer = ByteBuffer.allocate(BUFFER_SIZE);
-        int bytes = this.channel.read(buffer);
+        this.readBuffer.clear();
+        int bytes = this.channel.read(this.readBuffer);
         if (bytes == END_OF_STREAM) throw new IOException();
-        this.responseQueue.put(new String(buffer.array()).trim());
+        this.responseQueue.put(new String(this.readBuffer.array(), 0, bytes, StandardCharsets.UTF_8));
         key.interestOps(SelectionKey.OP_WRITE);
     }
 
