@@ -13,9 +13,8 @@ import java.util.concurrent.BlockingQueue;
 public final class Connection implements Runnable {
 
     private final static int END_OF_STREAM = -1;
-    private final static int BUFFER_SIZE = 1024 * 1024;
 
-    private final ByteBuffer readBuffer = ByteBuffer.allocate(BUFFER_SIZE);
+    private final ByteBuffer readBuffer = ByteBuffer.allocate(1024 * 1024);
     private final BlockingQueue<String> requestQueue = new ArrayBlockingQueue<>(1);
     private final BlockingQueue<String> responseQueue = new ArrayBlockingQueue<>(1);
     private final Selector selector;
