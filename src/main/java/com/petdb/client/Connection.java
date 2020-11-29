@@ -64,7 +64,7 @@ public final class Connection implements Runnable {
         key.interestOps(SelectionKey.OP_WRITE);
     }
 
-    private void close() {
+    public void close() {
         try {
             this.channel.close();
         } catch (IOException e) {
